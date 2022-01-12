@@ -78,8 +78,8 @@ def main():
 	
 	
     #get title_abstracts 
-    title_abstracts = pickle.load(open("title_abstracts.pkl", "rb")).tolist()
-    train_Y = pickle.load(open("train_Y.pkl", "rb"))
+    title_abstracts = pickle.load(open("output/title_abstracts.pkl", "rb")).tolist()
+    train_Y = pickle.load(open("output/train_Y.pkl", "rb"))
     
     tfidf = TfidfVectorizer(sublinear_tf=True, min_df = 5, norm='l2')
     X = tfidf.fit_transform(title_abstracts).toarray()
@@ -94,7 +94,7 @@ def main():
 
 	#train naive bayes model
     model = naive_bayes(train_X, train_Y)
-    write_file = open("naive_bayes_model.pkl", "wb")
+    write_file = open("output/naive_bayes_model.pkl", "wb")
     pickle.dump(model, write_file) 
    
 
