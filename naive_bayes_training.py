@@ -86,30 +86,14 @@ def main():
     selector = SelectKBest(chi2, k=100)
     train_X = selector.fit_transform(X, train_Y)
     print(selector.get_feature_names_out(features))
+    write_file = open("output/features.pkl", "wb")
+    pickle.dump(features, write_file) 
 
-
-	#train naive bayes model
+    #train naive bayes model
     model = naive_bayes(train_X, train_Y)
     write_file = open("output/naive_bayes_model.pkl", "wb")
     pickle.dump(model, write_file) 
-   
-
-
-
     
-    
-    
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     main()

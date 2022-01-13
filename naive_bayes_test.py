@@ -7,8 +7,6 @@ import pickle
 
 features = ""
 
-
-
 #preprossing
 def document_cleaner(text, ps):
     global stopwords
@@ -46,21 +44,24 @@ def main():
 
     
     #load test_title_abstract and test the model
-    path = 'BC7-LitCovid-Dev.csv'
+    path = "dataset/BC7-LitCovid-Dev.csv"
     test_df = pd.read_csv(path, sep=',')
     pmid_ids = test_df['pmid']
-    features = pickle.load(open("features.pkl", "rb")).tolist()
-    test_title_abstracts = pickle.load(open("test_title_abstracts.pkl", "rb")).tolist()
+    del test_df
+    features = pickle.load(open("output/features.pkl", "rb")).tolist()
+    test_title_abstracts = pickle.load(open("output/test_title_abstracts.pkl", "rb")).tolist()
     tfidf = TfidfVectorizer()
     test_X = tfidf.fit_transform(test_title_abstracts).toarray()
-    nb_model = pickle.load(open("naive_bayes_model.pkl", "rb"))
+    nb_model = pickle.load(open("output/naive_bayes_model.pkl", "rb"))
     Y = nb_model.predict_proba(test_X)
-    Y = nb_model.predict(test_X)    
+    #Y = nb_model.predict(test_X)
+    '''
+    print(Y[5])
     for i in range(len(Y)):
         if Y[i] == 5:
             print(i)
+    '''
     result = []
-    
     
     #append the predictions
     for index, element in enumerate(Y):
@@ -76,8 +77,8 @@ def main():
         result.append(test_Y)
     
     columns = ['PMID', 'Treatment', 'Diagnosis', 'Prevention', 'Mechanism', 'Transmission', 'Epidemic Forecasting', 'Case Report']
-    #dx = pd.DataFrame(result, columns = columns)
-    #dx.to_csv('prediction.csv', index=False)
+    dx = pd.DataFrame(result, columns = columns)
+    dx.to_csv("output/prediction.csv", index=False)
 
     
     
