@@ -1,0 +1,3 @@
+[submodule "biocreative_litcovid"]
+	path = biocreative_litcovid
+	url = https://github.com/ncbi/biocreative_litcovid.git

@@ -2,6 +2,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem import PorterStemmer
 from sklearn.feature_selection import chi2, SelectKBest
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
+from sklearn.calibration import CalibratedClassifierCV
 import pandas as pd
 import numpy as np
 import string
@@ -38,8 +40,10 @@ def naive_bayes(X, Y):
     bayes_model = multinomial_bayes.fit(X, Y)
     #bayes_y = multinomial_bayes.predict(X_test)
     return bayes_model
-
-
+def svm_linear(X, Y):
+    lsvc = CalibratedClassifierCV(LinearSVC())
+    lsvm_model = lsvc.fit(X,Y)
+    return lsvm_model
 def document_cleaner(text, ps):
     global stopwords
     text = text.lower()
@@ -57,7 +61,13 @@ def document_cleaner(text, ps):
 
 
 def main():
-
+    # PARAMETERS FOR DOING ANALYSIS
+    '''
+    min_df is minimum possible for all
+    unigram | bigram | unigram + bigram
+    '''
+    ngram = (1,2) # (1,1) = unigram | (2,2) = bigram | (1,2) = unigram + bigram
+    min_df = 10
     #concatenating title and abstract and writing to a file
     if not os.path.exists("output/title_abstracts.pkl"):
         ps = PorterStemmer()
@@ -71,28 +81,34 @@ def main():
         pickle.dump(title_abstracts, write_file)
     else:
         #get title_abstracts
-        print("loading")
         title_abstracts = pickle.load(open("output/title_abstracts.pkl", "rb")).tolist()
     
     train_Y = pickle.load(open("output/train_Y.pkl", "rb"))
-    tfidf = TfidfVectorizer(sublinear_tf=True, min_df = 5, norm='l2')
-    print("breakpoint")
+    tfidf = TfidfVectorizer(sublinear_tf=True, min_df = min_df, norm='l2',ngram_range = ngram)
     fit_tr = tfidf.fit_transform(title_abstracts)
-    print(fit_tr.shape)
     X = fit_tr.toarray()
-	#feature selection
+    print(X.shape)
+    #(1,1) (34246, 14435)
+    #(2,2) (34246, 131559)
+    #(1,2) (34246, 145994)
+    #feature selection
     features = tfidf.get_feature_names_out()
     #select best 100 feature
     selector = SelectKBest(chi2, k=100)
     train_X = selector.fit_transform(X, train_Y)
-    print(selector.get_feature_names_out(features))
+    print(len(train_X))
+    print(len(features))
+    selected_features = set(selector.get_feature_names_out(features))
+    print(len(selected_features))
+    print(selected_features)
     write_file = open("output/features.pkl", "wb")
-    pickle.dump(features, write_file) 
-
+    pickle.dump(selected_features, write_file) 
     #train naive bayes model
-    model = naive_bayes(train_X, train_Y)
+    # model = naive_bayes(train_X, train_Y)
+    # SVM
+    model = svm_linear(train_X, train_Y)
     write_file = open("output/naive_bayes_model.pkl", "wb")
-    pickle.dump(model, write_file) 
+    pickle.dump(model, write_file)
     
 
 if __name__ == "__main__":
