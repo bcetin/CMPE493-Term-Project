@@ -6,10 +6,7 @@ import pandas as pd
 import numpy as np
 import string
 import pickle
-
-
-
-
+import os.path
 
 stopwords = {'i', 'me', 'my', 'myself', 'we', 
     'our', 'ours', 'ourselves', 'you', "you're", "you've", 
@@ -61,29 +58,28 @@ def document_cleaner(text, ps):
 
 def main():
 
-	#concatenating title and abstract and writing to a file
-    '''
-    ps = PorterStemmer()
-    df = pickle.load(open("df.pkl", "rb"))
+    #concatenating title and abstract and writing to a file
+    if not os.path.exists("output/title_abstracts.pkl"):
+        ps = PorterStemmer()
+        df = pickle.load(open("output/df.pkl", "rb"))
 
-    df['abstract'] = df['abstract'].map(lambda document : document_cleaner(document, ps))
-    df['title'] = df['title'].map(lambda document : document_cleaner(document, ps))
-    title_abstracts = df['title'] + " " + df['abstract']
+        df['abstract'] = df['abstract'].map(lambda document : document_cleaner(document, ps))
+        df['title'] = df['title'].map(lambda document : document_cleaner(document, ps))
+        title_abstracts = df['title'] + " " + df['abstract']
+        
+        write_file = open("output/title_abstracts.pkl", "wb")
+        pickle.dump(title_abstracts, write_file)
+    else:
+        #get title_abstracts
+        print("loading")
+        title_abstracts = pickle.load(open("output/title_abstracts.pkl", "rb")).tolist()
     
-    write_file = open("title_abstracts.pkl", "wb")
-    pickle.dump(title_abstracts, write_file)
-    
-
-    '''
-	
-	
-    #get title_abstracts 
-    title_abstracts = pickle.load(open("output/title_abstracts.pkl", "rb")).tolist()
     train_Y = pickle.load(open("output/train_Y.pkl", "rb"))
-    
     tfidf = TfidfVectorizer(sublinear_tf=True, min_df = 5, norm='l2')
-    X = tfidf.fit_transform(title_abstracts).toarray()
-    
+    print("breakpoint")
+    fit_tr = tfidf.fit_transform(title_abstracts)
+    print(fit_tr.shape)
+    X = fit_tr.toarray()
 	#feature selection
     features = tfidf.get_feature_names_out()
     #select best 100 feature

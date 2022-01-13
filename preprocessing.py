@@ -10,7 +10,6 @@ from sklearn import preprocessing
 import pickle
 import os.path
 
-import gc
 
 def main():
     ps = PorterStemmer()
@@ -103,10 +102,8 @@ def main():
         tokens = pickle.load(open("output/new_tokens.pkl", "rb"))
 
     print(dir())
-    del df
-    gc.collect()
     dx = pd.DataFrame((title_abstract_word_frequency), columns=tokens)
-    dx = dx.fillna(0)
+    #dx = dx.fillna(0)
     print("fillna")
     
     le = preprocessing.LabelEncoder()
