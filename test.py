@@ -48,7 +48,7 @@ def main():
         print(features)
         test_df['abstract'] = test_df['abstract'].map(lambda document : document_cleaner(document, ps))
         test_df['title'] = test_df['title'].map(lambda document : document_cleaner(document, ps))
-        test_title_abstracts = test_df['title'] + " " + test_df['abstract']
+        test_title_abstracts = test_df['title'] + " " + test_df['abstract'] + " " + test_df['title'] + " " + test_df['title'] + " " + test_df['title'] 
         
         write_file = open("output/test_title_abstracts.pkl", "wb")
         pickle.dump(test_title_abstracts, write_file)

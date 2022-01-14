@@ -41,7 +41,7 @@ def naive_bayes(X, Y):
     #bayes_y = multinomial_bayes.predict(X_test)
     return bayes_model
 def svm_linear(X, Y):
-    lsvc = CalibratedClassifierCV(SVC(kernel = 'rbf'))
+    lsvc = CalibratedClassifierCV(SVC(kernel = 'linear'))
     lsvm_model = lsvc.fit(X,Y)
     return lsvm_model
 def document_cleaner(text, ps):
@@ -94,7 +94,7 @@ def main():
     #feature selection
     features = tfidf.get_feature_names_out()
     #select best 100 feature
-    selector = SelectKBest(chi2, k=100)
+    selector = SelectKBest(chi2, k=300)
     train_X = selector.fit_transform(X, train_Y)
     print(len(train_X))
     print(len(features))
@@ -106,7 +106,7 @@ def main():
     #train naive bayes model
     # model = naive_bayes(train_X, train_Y)
     # SVM
-    model = naive_bayes(train_X, train_Y)
+    model = svm_linear(train_X, train_Y)
     write_file = open("output/naive_bayes_model.pkl", "wb")
     pickle.dump(model, write_file)
     
