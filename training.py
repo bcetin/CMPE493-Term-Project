@@ -2,7 +2,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem import PorterStemmer
 from sklearn.feature_selection import chi2, SelectKBest
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from sklearn.calibration import CalibratedClassifierCV
 import pandas as pd
 import numpy as np
@@ -41,7 +41,7 @@ def naive_bayes(X, Y):
     #bayes_y = multinomial_bayes.predict(X_test)
     return bayes_model
 def svm_linear(X, Y):
-    lsvc = CalibratedClassifierCV(LinearSVC())
+    lsvc = CalibratedClassifierCV(SVC(kernel = 'rbf'))
     lsvm_model = lsvc.fit(X,Y)
     return lsvm_model
 def document_cleaner(text, ps):
@@ -66,7 +66,7 @@ def main():
     min_df is minimum possible for all
     unigram | bigram | unigram + bigram
     '''
-    ngram = (1,2) # (1,1) = unigram | (2,2) = bigram | (1,2) = unigram + bigram
+    ngram = (1,1) # (1,1) = unigram | (2,2) = bigram | (1,2) = unigram + bigram
     min_df = 10
     #concatenating title and abstract and writing to a file
     if not os.path.exists("output/title_abstracts.pkl"):
@@ -106,7 +106,7 @@ def main():
     #train naive bayes model
     # model = naive_bayes(train_X, train_Y)
     # SVM
-    model = svm_linear(train_X, train_Y)
+    model = naive_bayes(train_X, train_Y)
     write_file = open("output/naive_bayes_model.pkl", "wb")
     pickle.dump(model, write_file)
     
